@@ -67,7 +67,7 @@ public class DirectoryServiceImpl implements DirectoryService {
         try
         {
             DirectoryEntity directoryEntity = getDirectoryEntityByName(dirName);
-            if (dirName.equals(DirectoryUtils.root)) {
+            if (dirName.equals(DirectoryUtils.rootPathName)) {
                 throw new BadRequestException(ErrorMessages.ROOT_NOT_DELETED);
             } else if (directoryEntity != null) {
                 directoryRepository.deleteByDirectoryName(dirName);

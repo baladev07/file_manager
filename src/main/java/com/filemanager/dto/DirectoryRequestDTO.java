@@ -59,7 +59,7 @@ public class DirectoryRequestDTO {
             }
             DirectoryEntity parentEntity = null;
             if (parentDirName == null || parentDirName.isEmpty()) {
-                parentEntity =  directoryRepository.findByDirectoryName("root");
+                parentEntity =  directoryRepository.findByDirectoryName(DirectoryUtils.rootPathName);
 
             }
             else {

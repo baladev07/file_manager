@@ -1,6 +1,7 @@
 package com.filemanager.file;
 
 
+import com.filemanager.Util.DirectoryUtils;
 import com.filemanager.Util.ErrorMessages;
 import com.filemanager.dto.DirectoryRequestDTO;
 import com.filemanager.exception.BadRequestException;
@@ -19,9 +20,9 @@ public class PathConstructor {
 
     public static String CURR_PATH = System.getProperty("user.dir");
 
-    public static String ABSOLUTE_ROOT_DIR_PATH = System.getProperty("user.dir")+"/root";
+    public static String ABSOLUTE_ROOT_DIR_PATH = System.getProperty("user.dir")+"/"+ DirectoryUtils.rootPathName;
 
-    public static String ROOT_PATH = "/root";
+    public static String ROOT_PATH = "/"+DirectoryUtils.rootPathName;
 
     private DirectoryRequestDTO directoryRequestDTO;
 

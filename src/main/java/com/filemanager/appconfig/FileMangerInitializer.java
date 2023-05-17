@@ -1,5 +1,6 @@
 package com.filemanager.appconfig;
 
+import com.filemanager.Util.DirectoryUtils;
 import com.filemanager.file.FileManager;
 import com.filemanager.file.PathConstructor;
 import com.filemanager.model.DirectoryEntity;
@@ -52,10 +53,10 @@ public class FileMangerInitializer implements ApplicationListener<ContextRefresh
 
     public  void createRootDirectory() throws Exception {
         DirectoryEntity directoryEntity = new DirectoryEntity();
-        directoryEntity.setDirectoryName("root");
+        directoryEntity.setDirectoryName(DirectoryUtils.rootPathName);
         directoryEntity.setParentDirectory(null);
-        String rootPath = PathConstructor.CURR_PATH + "/root";
-        directoryEntity.setDirectoryPath("/root");
+        String rootPath = DirectoryUtils.CURR_PATH + "/"+DirectoryUtils.rootPathName;
+        directoryEntity.setDirectoryPath("/"+DirectoryUtils.rootPathName);
         FileManager.createDirectory(rootPath);
         directoryRepository.save(directoryEntity);
     }

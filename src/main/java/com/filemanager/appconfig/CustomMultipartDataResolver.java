@@ -1,5 +1,6 @@
 package com.filemanager.appconfig;
 
+import com.filemanager.Util.DirectoryUtils;
 import com.filemanager.dto.FileDetailsDTO;
 import com.filemanager.exception.BadRequestException;
 import org.springframework.core.MethodParameter;
@@ -36,7 +37,7 @@ public class CustomMultipartDataResolver implements HandlerMethodArgumentResolve
             String dirName = servletRequest.getParameter("dir_name");
             if(dirName==null || dirName.isEmpty())
             {
-                dirName = "root";
+                dirName = DirectoryUtils.rootPathName;
             }
             while (iterator.hasNext()) {
                 String key = (String) iterator.next();
