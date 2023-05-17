@@ -13,5 +13,7 @@ public class ErrorMessages {
 
     public static String ROOT_NOT_DELETED = "You cannot delete root directory.";
 
+    public static String FILE_NOT_EXISTS = "File does not exists.";
+
 
 }

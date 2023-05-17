@@ -1,5 +1,6 @@
 package com.filemanager.model;
 
+import com.filemanager.Util.DirectoryUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
@@ -21,7 +22,7 @@ public class DirectoryEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_entity_seq")
     @SequenceGenerator(name = "my_entity_seq", allocationSize = 10, initialValue = 10000001)
-    private int directoryId;
+    private long directoryId;
 
     private String directoryName;
 
@@ -30,5 +31,10 @@ public class DirectoryEntity extends BaseEntity {
     @ManyToOne
     @JoinColumn(name="parent_directory_id",updatable = false)
     private DirectoryEntity parentDirectory;
+
+    public String getAbsolutePath()
+    {
+        return DirectoryUtils.CURR_PATH+directoryPath;
+    }
 
 }

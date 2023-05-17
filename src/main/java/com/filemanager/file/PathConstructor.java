@@ -49,7 +49,7 @@ public class PathConstructor {
     public void set(String currDir)
     {
         this.currDirName = currDir;
-        DirectoryEntity directoryEntity = directoryService.getDirectory(currDir);
+        DirectoryEntity directoryEntity = directoryService.getDirectoryEntityByName(currDir);
         this.parentDirName = directoryEntity.getParentDirectory().getDirectoryName();
     }
 
@@ -84,7 +84,7 @@ public class PathConstructor {
     {
         DirectoryEntity parentDirEntity = null;
         if (!parentDirName.isEmpty()) {
-            parentDirEntity = directoryService.getDirectory(this.parentDirName);
+            parentDirEntity = directoryService.getDirectoryEntityByName(this.parentDirName);
             if (parentDirEntity != null) {
                 constructAbsolutePathWithParentDir(parentDirEntity);
             } else {

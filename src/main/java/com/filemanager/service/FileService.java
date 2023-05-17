@@ -1,15 +1,23 @@
 package com.filemanager.service;
 
-import com.filemanager.dto.FileDetailsObject;
+import com.filemanager.dto.FileDetailsDTO;
+import com.filemanager.model.DirectoryEntity;
+import com.filemanager.model.FileEntity;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface FileService {
 
-    void store(FileDetailsObject fileDetailsObject) throws Exception;
+    void upload(FileDetailsDTO fileDetailsObject) throws Exception;
 
-    void delete();
+    void delete(long id) throws Exception;
 
-    void getFile();
+    FileEntity getFile(long id);
 
+    List getFilesList();
 
+    List getFilesListInDirectory(DirectoryEntity directoryEntity);
+
+    void downloadFile(long id);
 }

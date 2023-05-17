@@ -2,14 +2,20 @@ package com.filemanager.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.filemanager.model.DirectoryEntity;
+import lombok.Builder;
 import lombok.Data;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Component;
 
 @Data
-public class DirectoryResponseDTO {
+@Builder
+public class DirectoryResponseDTO implements ResponseDTO {
 
 
     @JsonProperty("directory_id")
-    private int directoryId;
+    private long directoryId;
 
 
     @JsonProperty("directory_name")
@@ -20,7 +26,7 @@ public class DirectoryResponseDTO {
     private String directoryPath;
 
 
-
     @JsonProperty(value="parent_dir_id",defaultValue = "null")
-    private int parentDirId;
+    private long parentDirId;
+
 }

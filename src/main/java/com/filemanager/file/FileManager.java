@@ -4,6 +4,8 @@ import com.filemanager.Util.DirectoryUtils;
 import com.filemanager.Util.ErrorMessages;
 import com.filemanager.Util.SuccessMessageConstants;
 import com.filemanager.appconfig.FileMangerInitializer;
+import com.filemanager.dto.FileDetailsDTO;
+
 import com.filemanager.exception.BadRequestException;
 import com.filemanager.exception.DirectoryNotCreatedException;
 import com.filemanager.model.DirectoryEntity;
@@ -12,6 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class FileManager {
@@ -35,40 +42,80 @@ public class FileManager {
         }
     }
 
+    // use this method to delete file
+    public static void deleteFile(String path) {
+        File dir = new File(path);
+        if (dir.delete()) {
+            logger.info(path + " " + SuccessMessageConstants.FILE_DELETED);
+            return;
+        }
+        logger.error(ErrorMessages.FILE_NOT_EXISTS);
+        throw new BadRequestException(ErrorMessages.FILE_NOT_EXISTS);
+    }
+
     public static void deleteDirectory(String dirPath,boolean isEmptyDir)
     {
-        if (isEmptyDir) {
+        if (isEmptyDir)
+        {
             logger.info(dirPath + " directory is empty.");
             File dir = new File(dirPath);
             if (dir.delete()) {
                 logger.info(dirPath +" "+SuccessMessageConstants.DIR_DELETED);
             }
-        } else {
-            logger.info(ErrorMessages.DIRECTORY_NOT_EXISTS);
-            throw new BadRequestException(ErrorMessages.DIRECTORY_NOT_EXISTS);
+            else {
+                logger.info(ErrorMessages.DIRECTORY_NOT_EXISTS);
+                throw new BadRequestException(ErrorMessages.DIRECTORY_NOT_EXISTS);
+            }
+        }
+        else {
+            deleteDirectoryAndFiles(dirPath);
         }
     }
 
-    public static String constructAbsolutePath(DirectoryEntity directoryEntity)
+    public static void uploadFile(FileDetailsDTO fileDetailsObject, String path) throws Exception {
+        try{
+            byte[] fileBytes =  fileDetailsObject.getBytes();
+            String filePath  = DirectoryUtils.CURR_PATH+path+"/"+fileDetailsObject.getFileNameWithFormat();
+            try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                fos.write(fileBytes);
+            }
+            logger.info("File successfully stored.");
+        }
+        catch(Exception e)
+        {
+            logger.error("Exception occurred during storing the file",e);
+            throw new BadRequestException("Something went wrong. please try again");
+        }
+    }
+
+    public static void deleteDirectoryAndFiles(String dirPath)
     {
-        DirectoryEntity root = null;
-        StringBuilder pathBuilder = new StringBuilder();
-        while(directoryEntity!=null)
-        {
-            DirectoryEntity currEntity = directoryEntity;
-            DirectoryEntity parentEntity = directoryEntity.getParentDirectory();
-            currEntity.setParentDirectory(root);
-            root = directoryEntity;
-            directoryEntity = parentEntity;
+        try {
+            Path directory = Paths.get(dirPath);
+            // Deleting the directory and its contents recursively
+            Files.walk(directory)
+                    .sorted((p1, p2) -> -p1.compareTo(p2))
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            logger.error("Failed to delete directory: "+ dirPath,e);
+                        }
+                    });
+            logger.info("Directory deleted successfully.");
+        } catch (IOException e) {
+            logger.error("Failed to delete directory: "+ dirPath,e);
         }
-        while(root!=null)
-        {
-            pathBuilder.append(root.getDirectoryName()+"/");
-            root = root.getParentDirectory();
+    }
+
+    public static byte[] downloadFile(String filePath) {
+        byte[] fileBytes = null;
+        try {
+            fileBytes = Files.readAllBytes(Path.of(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        return pathBuilder.toString();
-
+        return fileBytes;
     }
 
 }

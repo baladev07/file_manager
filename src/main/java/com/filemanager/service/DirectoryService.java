@@ -9,9 +9,9 @@ import java.util.List;
 public interface DirectoryService{
 
 
-    void createDirectory(DirectoryRequestDTO directoryRequestDTO);
+    void createDirectory(DirectoryRequestDTO directoryRequestDTO) throws Exception;
 
-    void deleteDirectory(String dirName);
+    void deleteDirectory(String dirName) throws Exception;
 
     void addFileToDirectory();
 
@@ -21,8 +21,10 @@ public interface DirectoryService{
 
     List<FileEntity> getAllFilesFromDirectory(String dirName);
 
-    List getListOfDirectories();
+    List getListOfDirectories() throws Exception;
 
-    DirectoryEntity getDirectory(String dirName);
+    DirectoryEntity getDirectoryEntityByName(String dirName);
+
+    DirectoryEntity getDirectoryEntityById(Integer id);
 
 }
