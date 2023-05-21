@@ -9,7 +9,7 @@ import java.util.List;
 public interface DirectoryService{
 
 
-    void createDirectory(DirectoryRequestDTO directoryRequestDTO) throws Exception;
+    DirectoryEntity createDirectory(String dirName,String dirPath) throws Exception;
 
     void deleteDirectory(String dirName) throws Exception;
 
@@ -25,6 +25,6 @@ public interface DirectoryService{
 
     DirectoryEntity getDirectoryEntityByName(String dirName);
 
-    DirectoryEntity getDirectoryEntityById(Integer id);
+    DirectoryEntity getDirectoryEntityById(Long id);
 
 }

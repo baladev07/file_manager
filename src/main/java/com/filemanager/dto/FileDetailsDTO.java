@@ -1,9 +1,6 @@
 package com.filemanager.dto;
 
 
-import com.filemanager.model.DirectoryEntity;
-import com.filemanager.model.FileEntity;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import org.springframework.web.multipart.MultipartFile;

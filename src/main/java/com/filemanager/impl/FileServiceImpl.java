@@ -2,6 +2,8 @@ package com.filemanager.impl;
 
 import com.filemanager.Util.DirectoryUtils;
 import com.filemanager.Util.ErrorMessages;
+import com.filemanager.appconfig.EntityContextHolder;
+import com.filemanager.custom_annotations.UniqueConstraintException;
 import com.filemanager.dto.EntityResponseBuilder;
 import com.filemanager.dto.FileDetailsDTO;
 import com.filemanager.dto.FileResponseDTO;
@@ -10,6 +12,7 @@ import com.filemanager.exception.BadRequestException;
 import com.filemanager.file.FileManager;
 import com.filemanager.model.DirectoryEntity;
 import com.filemanager.model.FileEntity;
+import com.filemanager.model.UserEntity;
 import com.filemanager.repository.DirectoryRepository;
 import com.filemanager.repository.FileRepository;
 import com.filemanager.service.DirectoryService;
@@ -44,25 +47,32 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    @Transactional
+    @UniqueConstraintException
     public void upload(FileDetailsDTO fileDetailsObject) throws Exception {
         try{
+
+            UserEntity userEntity = EntityContextHolder.getEntityContext().getEntity(UserEntity.class);
             FileEntity entity = new FileEntity();
             DirectoryEntity directoryEntity = directoryRepository.findByDirectoryName(fileDetailsObject.getDirName());
+            if(directoryEntity==null)
+            {
+                throw new BadRequestException(ErrorMessages.DIRECTORY_NOT_EXISTS);
+            }
             entity.setDirectoryEntity(directoryEntity);
             entity.setFileFormat(fileDetailsObject.getFileFormat());
             entity.setFileSize(fileDetailsObject.getSize());
             entity.setFileName(fileDetailsObject.getFileName());
             entity.setFileUploadedTime(new Date().getTime());
-            FileManager.uploadFile(fileDetailsObject,directoryEntity.getDirectoryPath());
+            entity.setUserEntity(userEntity);
             fileRepository.save(entity);
+            FileManager.uploadFile(fileDetailsObject,directoryEntity.getDirectoryPath());
             logger.info("File successfully uploaded and saved.");
             entityResponseBuilder.buildResponseDTO(entity);
         }
         catch(Exception ex)
         {
             logger.error("Exception occurred during uploading file.",ex);
-            throw new Exception();
+            throw ex;
         }
 
     }
@@ -109,7 +119,8 @@ public class FileServiceImpl implements FileService {
 
     public List getFilesList()
     {
-        List<FileEntity>fileEntities = fileRepository.findAll();
+        UserEntity userEntity = EntityContextHolder.getEntityContext().getEntity(UserEntity.class);
+        List<FileEntity>fileEntities = fileRepository.findByUserEntity(userEntity);
         List<ResponseDTO>fileDetailsDTOS = new ArrayList<>();
         for(FileEntity fileEntity:fileEntities)
         {
@@ -126,9 +137,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void downloadFile(long id) {
-
         FileEntity entity = getFile(id);
         entity.getFilePath();
-
     }
 }

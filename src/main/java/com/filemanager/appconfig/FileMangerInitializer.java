@@ -5,8 +5,10 @@ import com.filemanager.file.FileManager;
 import com.filemanager.file.PathConstructor;
 import com.filemanager.model.DirectoryEntity;
 import com.filemanager.model.FileEntity;
+import com.filemanager.model.UserEntity;
 import com.filemanager.repository.DirectoryRepository;
 import com.filemanager.repository.FileRepository;
+import com.filemanager.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class FileMangerInitializer implements ApplicationListener<ContextRefresh
     @Autowired
     FileRepository fileRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
     private static boolean isPopulated = false;
 
     @Override
@@ -33,6 +38,7 @@ public class FileMangerInitializer implements ApplicationListener<ContextRefresh
         try{
             if (!isPopulated && !directoryRepository.findAll().iterator().hasNext()) {
                 createRootDirectory();
+                createUserIfNotExist("user2","user2@gmail.com","user2");
                 isPopulated = true;
             }
         }
@@ -59,5 +65,18 @@ public class FileMangerInitializer implements ApplicationListener<ContextRefresh
         directoryEntity.setDirectoryPath("/"+DirectoryUtils.rootPathName);
         FileManager.createDirectory(rootPath);
         directoryRepository.save(directoryEntity);
+    }
+
+    public void createUserIfNotExist(String name, String email, String password)
+    {
+        UserEntity userEntity = userRepository.findByUsername(name);
+        if(userEntity ==null)
+        {
+            userEntity = new UserEntity();
+            userEntity.setUsername(name);
+            userEntity.setEmail(email);
+            userEntity.setPassword(password);
+            userRepository.save(userEntity);
+        }
     }
 }

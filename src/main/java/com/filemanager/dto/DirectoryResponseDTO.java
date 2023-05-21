@@ -27,6 +27,6 @@ public class DirectoryResponseDTO implements ResponseDTO {
 
 
     @JsonProperty(value="parent_dir_id",defaultValue = "null")
-    private long parentDirId;
+    private Long parentDirId;
 
 }

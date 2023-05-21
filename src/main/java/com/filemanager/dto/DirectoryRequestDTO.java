@@ -10,13 +10,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import com.filemanager.Util.DirectoryUtils;
+import com.filemanager.appconfig.EntityContextHolder;
+import com.filemanager.dao.DirectoryDAO;
+import com.filemanager.impl.UserServiceImpl;
 import com.filemanager.model.DirectoryEntity;
+import com.filemanager.model.UserEntity;
 import com.filemanager.repository.DirectoryRepository;
+import com.filemanager.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -34,7 +40,7 @@ public class DirectoryRequestDTO {
         return dirName;
     }
 
-    private String absoluteDirPath;
+    private String dirPath;
 
     private String currDirPath;
 
@@ -42,6 +48,9 @@ public class DirectoryRequestDTO {
     public static class DirectoryRequestDTODeserializer extends JsonDeserializer<DirectoryRequestDTO> {
         @Autowired
         DirectoryRepository directoryRepository;
+
+        @Autowired
+        DirectoryDAO directoryDAO;
 
         @Override
         public DirectoryRequestDTO deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
@@ -59,13 +68,39 @@ public class DirectoryRequestDTO {
             }
             DirectoryEntity parentEntity = null;
             if (parentDirName == null || parentDirName.isEmpty()) {
-                parentEntity =  directoryRepository.findByDirectoryName(DirectoryUtils.rootPathName);
 
+                if (EntityContextHolder.getEntityContext().getEntity(UserEntity.class) != null) {
+                    UserEntity userEntity = EntityContextHolder.getEntityContext().getEntity(UserEntity.class);
+                    String userDirName = userEntity.getUserDirName();
+                    parentEntity = directoryRepository.findByDirectoryName(userDirName);
+                }
+                else {
+                    parentEntity =  directoryRepository.findByDirectoryName(DirectoryUtils.rootPathName);
+                }
             }
             else {
-                parentEntity =  directoryRepository.findByDirectoryName(parentDirName);
+                if (EntityContextHolder.getEntityContext().getEntity(UserEntity.class) != null)
+                {
+                    UserEntity userEntity = EntityContextHolder.getEntityContext().getEntity(UserEntity.class);
+                    Long directoryId = userEntity.getDirectoryEntity().getDirectoryId();
+                    List<DirectoryEntity> subDirectories = directoryRepository.getSubDirectoriesList(directoryId);
+                    if(!subDirectories.isEmpty())
+                    {
+                        for(DirectoryEntity directory:subDirectories)
+                        {
+                            if(directory.getDirectoryName().equals(parentDirName))
+                            {
+                                parentEntity = directory;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else {
+                    parentEntity =  directoryRepository.findByDirectoryName(parentDirName);
+                }
             }
-            String abs =DirectoryUtils.CURR_PATH+parentEntity.getDirectoryPath()+"/"+dirName;
+            String abs =  parentEntity.getDirectoryPath();
             String currDirPath = parentEntity.getDirectoryPath()+"/"+dirName;
             return new DirectoryRequestDTO(dirName, parentDirName, parentEntity,abs,currDirPath);
         }

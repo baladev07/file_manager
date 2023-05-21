@@ -18,13 +18,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Pattern;
-import java.util.Arrays;
 
 
 @RestController
 @Validated
 @RequestMapping("/api")
-public class FileAPI {
+public class FileController {
 
     @Autowired
     FileService fileService;
@@ -56,7 +55,7 @@ public class FileAPI {
     @GetMapping("/files")
     public ResponseEntity getFilesList()
     {
-        return ResponseEntity.ok(httpResponseBuilder.message("success").data("directories",fileService.getFilesList()).build());
+        return ResponseEntity.ok(httpResponseBuilder.message("success").data("files",fileService.getFilesList()).build());
     }
 
     @GetMapping("/file/{id}/download")

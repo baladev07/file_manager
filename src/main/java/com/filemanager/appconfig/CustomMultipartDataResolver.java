@@ -3,6 +3,7 @@ package com.filemanager.appconfig;
 import com.filemanager.Util.DirectoryUtils;
 import com.filemanager.dto.FileDetailsDTO;
 import com.filemanager.exception.BadRequestException;
+import com.filemanager.model.UserEntity;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -37,7 +38,8 @@ public class CustomMultipartDataResolver implements HandlerMethodArgumentResolve
             String dirName = servletRequest.getParameter("dir_name");
             if(dirName==null || dirName.isEmpty())
             {
-                dirName = DirectoryUtils.rootPathName;
+                UserEntity user = EntityContextHolder.getEntityContext().getEntity(UserEntity.class);
+                dirName = user.getUserDirName();
             }
             while (iterator.hasNext()) {
                 String key = (String) iterator.next();
@@ -53,6 +55,14 @@ public class CustomMultipartDataResolver implements HandlerMethodArgumentResolve
                     .dirName(dirName)
                     .build();
         }
+        else {
+            assert servletRequest != null;
+            if(servletRequest.getRequestURI().contains("/api/upload"))
+            {
+                throw new BadRequestException("no attachment found");
+            }
+        }
+
         return fileDetailsDTO;
     }
 }

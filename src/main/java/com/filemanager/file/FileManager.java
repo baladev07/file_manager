@@ -3,15 +3,12 @@ package com.filemanager.file;
 import com.filemanager.Util.DirectoryUtils;
 import com.filemanager.Util.ErrorMessages;
 import com.filemanager.Util.SuccessMessageConstants;
-import com.filemanager.appconfig.FileMangerInitializer;
 import com.filemanager.dto.FileDetailsDTO;
 
 import com.filemanager.exception.BadRequestException;
-import com.filemanager.exception.DirectoryNotCreatedException;
-import com.filemanager.model.DirectoryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 public class FileManager {
 

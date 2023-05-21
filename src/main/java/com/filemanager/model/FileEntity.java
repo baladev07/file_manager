@@ -12,6 +12,8 @@ import javax.persistence.*;
 @Setter
 public class FileEntity extends BaseEntity{
 
+
+    @Column(unique = true)
     private String fileName;
 
 
@@ -30,6 +32,10 @@ public class FileEntity extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "directory_id")
     private DirectoryEntity directoryEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity userEntity;
 
     public String getFileNameWithFormat()
     {

@@ -2,6 +2,9 @@ package com.filemanager.impl;
 
 import com.filemanager.Util.DirectoryUtils;
 import com.filemanager.Util.ErrorMessages;
+import com.filemanager.appconfig.ApplicationContextHolder;
+import com.filemanager.appconfig.EntityContext;
+import com.filemanager.appconfig.EntityContextHolder;
 import com.filemanager.dao.DirectoryDAO;
 import com.filemanager.dto.DirectoryRequestDTO;
 import com.filemanager.dto.DirectoryResponseDTO;
@@ -10,7 +13,9 @@ import com.filemanager.exception.BadRequestException;
 import com.filemanager.file.FileManager;
 import com.filemanager.model.DirectoryEntity;
 import com.filemanager.model.FileEntity;
+import com.filemanager.model.UserEntity;
 import com.filemanager.repository.DirectoryRepository;
+import com.filemanager.repository.UserRepository;
 import com.filemanager.service.DirectoryService;
 import com.filemanager.service.FileService;
 import org.slf4j.Logger;
@@ -43,22 +48,28 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     @Transactional
-    public void createDirectory(DirectoryRequestDTO directoryRequestDTO) throws Exception {
+    public DirectoryEntity createDirectory(String dirName,String dirPath) throws Exception {
+        DirectoryEntity directoryEntity = new DirectoryEntity();
         try{
-            DirectoryEntity directoryEntity = new DirectoryEntity();
-            String abs = directoryRequestDTO.getAbsoluteDirPath();
-            directoryEntity.setParentDirectory(directoryRequestDTO.getParentEntity());
-            directoryEntity.setDirectoryName(directoryRequestDTO.getDirName());
-            directoryEntity.setDirectoryPath(directoryRequestDTO.getCurrDirPath());
+            String abs = DirectoryUtils.getAbsolutePath(dirName,dirPath);
+            DirectoryEntity parentEntity = directoryDAO.getParentEntity(dirPath);
+            directoryEntity.setParentDirectory(parentEntity);
+            directoryEntity.setDirectoryName(dirName);
+            directoryEntity.setDirectoryPath(dirPath+"/"+dirName);
             directoryRepository.save(directoryEntity);
             FileManager.createDirectory(abs);
             logger.info("Directory created and saved successfully.");
         }
+        catch (BadRequestException e)
+        {
+            throw e;
+        }
         catch (Exception e)
         {
             logger.error("Exception occurred during creating directory.",e);
-            throw new Exception();
+            throw new Exception(e);
         }
+        return directoryEntity;
     }
 
     @Override
@@ -66,7 +77,8 @@ public class DirectoryServiceImpl implements DirectoryService {
     public void deleteDirectory(String dirName) throws Exception {
         try
         {
-            DirectoryEntity directoryEntity = getDirectoryEntityByName(dirName);
+            UserEntity userEntity = EntityContextHolder.getEntityContext().getEntity(UserEntity.class);
+            DirectoryEntity directoryEntity = directoryRepository.findByDirectoryName(dirName,userEntity.getDirectoryEntity().getDirectoryId());
             if (dirName.equals(DirectoryUtils.rootPathName)) {
                 throw new BadRequestException(ErrorMessages.ROOT_NOT_DELETED);
             } else if (directoryEntity != null) {
@@ -117,7 +129,8 @@ public class DirectoryServiceImpl implements DirectoryService {
     public List getListOfDirectories() throws Exception {
         try
         {
-            List<DirectoryEntity>directoryEntityList = directoryRepository.findAll();
+            UserEntity userEntity1 = EntityContextHolder.getEntityContext().getEntity(UserEntity.class);
+            List<DirectoryEntity>directoryEntityList = directoryRepository.getSubDirectoriesList(userEntity1.getDirectoryEntity().getDirectoryId());
             List<DirectoryResponseDTO> responseDTOS = new ArrayList<>();
             for(DirectoryEntity directory:directoryEntityList)
             {
@@ -144,12 +157,11 @@ public class DirectoryServiceImpl implements DirectoryService {
         return getAllFilesFromDirectory(name).isEmpty();
     }
 
-    public DirectoryEntity getDirectoryEntityById(Integer id)
+    public DirectoryEntity getDirectoryEntityById(Long id)
     {
         DirectoryEntity directoryEntity = directoryRepository.findByDirectoryId(id);
         entityResponseBuilder.buildResponseDTO(directoryEntity);
         return directoryEntity;
 
     }
-
 }

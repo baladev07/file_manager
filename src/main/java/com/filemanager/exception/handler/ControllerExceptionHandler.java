@@ -24,11 +24,11 @@ public class ControllerExceptionHandler  {
     Logger logger = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity badRequestHandler(Exception ex)
-    {
-        return ResponseEntity.badRequest().body(new HttpResponseBuilder().message(ex.getMessage()).build());
-    }
+//    @ExceptionHandler(BadRequestException.class)
+//    public ResponseEntity badRequestHandler(Exception ex)
+//    {
+//        return ResponseEntity.badRequest().body(new HttpResponseBuilder().message(ex.getMessage()).build());
+//    }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity handleNoHandlerFoundException(NoHandlerFoundException ex) {
@@ -48,11 +48,18 @@ public class ControllerExceptionHandler  {
             logger.error("Exception occurred in /upload api.",ex);
             return ResponseEntity.badRequest().body(httpResponseBuilder.message(ex.getMessage()).build());
         }
+
+        else if(ex instanceof BadRequestException)
+        {
+            return ResponseEntity.badRequest().body(new HttpResponseBuilder().message(ex.getMessage()).build());
+        }
         else if(ex instanceof ConstraintViolationException)
         {
             return ResponseEntity.badRequest().body(httpResponseBuilder.message("Invalid Id").build());
         }
-        logger.error(ex.getMessage(),ex);
+        else {
+            logger.error(ex.getMessage(),ex);
+        }
         return ResponseEntity.badRequest().body(httpResponseBuilder.message("Internal error").build());
     }
 

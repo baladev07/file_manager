@@ -4,7 +4,6 @@ package com.filemanager.controller;
 import com.filemanager.Util.SuccessMessageConstants;
 import com.filemanager.dao.DirectoryDAO;
 import com.filemanager.dto.DirectoryRequestDTO;
-import com.filemanager.dto.DirectoryResponseDTO;
 import com.filemanager.dto.EntityResponseBuilder;
 import com.filemanager.exception.BadRequestException;
 import com.filemanager.http.HttpResponseBuilder;
@@ -21,7 +20,7 @@ import javax.validation.constraints.Pattern;
 @RestController
 @Validated
 @RequestMapping("/api")
-public class DirectoryAPI
+public class DirectoryController
 {
     @Autowired
     DirectoryService directoryService;
@@ -35,7 +34,13 @@ public class DirectoryAPI
 
     @PostMapping("/directory")
     public ResponseEntity createDirectory(@RequestBody DirectoryRequestDTO directoryRequest) throws Exception {
-        directoryService.createDirectory(directoryRequest);
+        String dirName = directoryRequest.getDirName();
+        String dirPath = directoryRequest.getDirPath();
+        if(dirName.isEmpty())
+        {
+            return ResponseEntity.badRequest().body(httpResponseBuilder.message("directory name is mandatory.").build());
+        }
+        directoryService.createDirectory(dirName,dirPath);
         return ResponseEntity.ok(httpResponseBuilder.message(SuccessMessageConstants.DIR_CREATED).build());
     }
 
@@ -48,7 +53,7 @@ public class DirectoryAPI
     @GetMapping("/directory/{id}")
     public ResponseEntity listAllDirectories(@PathVariable @Pattern(regexp = "\\d+", message = "Invalid ID")String id)
     {
-        DirectoryEntity directoryEntity = directoryService.getDirectoryEntityById(Integer.valueOf(id));
+        DirectoryEntity directoryEntity = directoryService.getDirectoryEntityById(Long.valueOf(id));
         if(directoryEntity==null)
         {
             throw new BadRequestException("No directory found");

@@ -22,7 +22,7 @@ public class DirectoryEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_entity_seq")
     @SequenceGenerator(name = "my_entity_seq", allocationSize = 10, initialValue = 10000001)
-    private long directoryId;
+    private Long directoryId;
 
     private String directoryName;
 
