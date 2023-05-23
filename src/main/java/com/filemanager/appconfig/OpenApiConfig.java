@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "REST API", version = "1.1",
-        contact = @Contact(name = "Chinna", email = "java4chinna@gmail.com")),
+        contact = @Contact(name = "bala", email = "balamurugan.venkatesan07@gmail.com")),
         security = {@SecurityRequirement(name = "basicAuth"), @SecurityRequirement(name = "bearerToken")}
 )
 @SecuritySchemes({
