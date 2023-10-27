@@ -1,4 +1,4 @@
-# File Manager Application
+#  Distributed File Managment Service
 
 This is a File Manager application built with Spring Boot, Hibernate, and JWT-based Spring Security. The application allows multiple users to manage their own files and folders securely. It provides RESTful endpoints for user authentication, file operations, directory management, and other CRUD operations.
 
